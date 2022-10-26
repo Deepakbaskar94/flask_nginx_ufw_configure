@@ -1,0 +1,100 @@
+#Deploying Flask App with WSGI and Apache Server on Ubuntu 20.04
+# https://asdkazmi.medium.com/deploying-flask-app-with-wsgi-and-apache-server-on-ubuntu-20-04-396607e0e40f
+
+1.	Create aws instance
+2. Connect to aws instance using ssh "ssh -i "my_aws_key.pem" ec2-user@ec2-13-233-143-108.ap-south-1.compute.amazonaws.com"
+3. python, Flask, apache2,Mod WSGI installation
+			sudo apt-get install python3
+			sudo apt-get install python3-pip
+			sudo apt-get install apache2
+			sudo apt-get install libapache2-mod-wsgi-py3
+			sudo pip3 install flask, numpy, pandas
+			sudo apt insall git
+			git clone https://url link
+			cd git directory
+			
+4. simple program flaskapp.py  	#keep both the files in /var/www/html/flaskapp
+			# flaskapp.py
+			# This is a "hello world" app sample for flask app. You may have a different file.
+			from flask import Flask
+			app = Flask(__name__)
+			@app.route('/') 
+			def hello_world():
+			   return 'Hello from Flask!' 
+			if __name__ == '__main__':
+			   app.run()
+			   
+5. simple program flaskapp.wsgi
+			import sys 
+			sys.path.insert(0, '/var/www/html/flaskapp')
+			from flaskapp import app as application
+			
+6. Configuration of Flask App with Apache Server Using WSGI
+
+			cd ~
+			sudo ln -sT ~/flaskapp /var/www/html/flaskapp			#symbolic link of our flaskapp directory with apache server and also we want to treat our link as a normal file always
+			sudo vi /etc/apache2/sites-enabled/000-default.conf
+
+7. 000-default.conf file configuration
+			
+			<VirtualHost *:80>
+					# The ServerName ...
+					# the server uses ...
+					# redirection URLs. In the ...
+					# specifies what hostname ...
+					# match this virtual host. For ...
+					# value is not decisive as ...
+					# However, you must set ...
+					#ServerName www.example.com
+					
+					ServerAdmin webmaster@localhost
+					DocumentRoot /var/www/html
+					
+					WSGIDaemonProcess flaskapp threads=5
+					WSGIScriptAlias / /var/www/html/flaskapp/flaskapp.wsgi
+					WSGIApplicationGroup %{GLOBAL}
+					<Directory flaskapp>
+						 WSGIProcessGroup flaskapp
+						 WSGIApplicationGroup %{GLOBAL}
+						 Order deny,allow
+						 Allow from all 
+					</Directory>
+					
+					
+					# Available loglevels: trace...
+					# error, crit, alert, emerg.
+					# It is also possible ...
+					# modules, e.g.
+					#LogLevel info ssl:warn
+					
+					ErrorLog ${APACHE_LOG_DIR}/error.log
+					CustomLog ${APACHE_LOG_DIR}/access.log combined
+					
+					#SSL certificate settings
+					SSLEngine on
+					SSLCertificateFile /etc/pki/mithraapp/447ae88935e750b6.crt
+					SSLCertificateKeyFile /etc/pki/generated-private-key.txt
+					SSLCertificateChainFile /etc/pki/mithraapp/gd_bundle-g2-g1.crt
+					
+					# For most configuration files from conf-available/, whic...
+					# enabled or disabled at a global level, it is possible to
+					# include a line for only one particular virtual host. F...
+					# following line enables the CGI configuration for this...
+					# after it has been globally disabled with "a2disconf".
+					#Include conf-available/serve-cgi-bin.conf
+					 Header set Access-Control-Allow-Origin "*"
+			</VirtualHost>
+			
+8. restart
+			sudo service apache2 restart
+			
+9. error logs
+			$ cat /var/log/apache2/error.log
+			OR
+			$ vi /var/log/apache2/error.log
+			
+10. check the ip in the browser
+						
+
+			
+			

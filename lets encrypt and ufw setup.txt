@@ -1,0 +1,33 @@
+lets encrypt configuration with ufw permission
+
+1. sudo apt update
+
+2. sudo apt install certbot python3-certbot-apache
+
+3. sudo ufw status
+
+open the ports
+
+ 
+
+4. sudo ufw app list
+
+5. sudo ufw allow 'Apache Full'
+
+6. sudo ufw allow OpenSSH
+
+7. sudo ufw status
+
+8. sudo ufw enable
+
+9. sudo certbot --apache
+
+                              deepak@probeplus.in
+                              A
+                              n
+                              1
+                              2 (to redirect to https)
+
+10. sudo systemctl status certbot.timer
+
+11. sudo certbot renew --dry-run
